@@ -3,7 +3,7 @@ var ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 particles = [];
-amount = 40;    // number of particles
+amount = 20;    // number of particles
 
 // Particle class
 class Particle{
@@ -12,13 +12,13 @@ class Particle{
         this.y = getRandomInt(0, window.innerHeight);
         this.vx = Math.random()/2;
         this.vy = Math.random()/3;
-        this.rad = getRandomInt(3, 10);
-        this.gradSize = getRandomInt(0, this.rad/2);
+        this.rad = getRandomInt(2, 9);
+        this.gradSize = getRandomInt(2, this.rad/1.1);
     }  
 
     relocate(){
         this.x = 0;
-        this.y = getRandomInt(0, window.innerHeight);
+        this.y = getRandomInt(0, window.innerHeight/1.5);
         this.vx = Math.random()/2;
         this.vy = Math.random()/3;
     }
@@ -27,7 +27,16 @@ class Particle{
         this.x += this.vx;
         this.y += this.vy;
 
+        // switches direction midway
+        if (this.x > window.innerWidth/2 && this.vy > 0){
+            this.vy = this.vy*(-1);
+        }
+
         if (this.x > window.innerWidth || this.y > window.innerHeight){
+            this.relocate();
+        }
+
+        if (this.y < 0) {
             this.relocate();
         }
     }
