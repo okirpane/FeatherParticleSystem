@@ -1,43 +1,65 @@
-const canvas = document.getElementById("canvas")
-var ctx = canvas.getContext('2d')
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
+const canvas = document.getElementById("canvas");
+var ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+particles = [];
+amount = 40;    // number of particles
 
-function draw() {
-    if (canvas.getContext) {
-        //setup
-        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        //draw
-        particle.draw();
-        particle.x += 0.2;
-        particle.y -= 0.2;
-        if (particle.y < 0 - (particle.size * 2) || particle.x < 0 - (particle.size * 2)) {
-            particle.x = particle.x - 250;
-            particle.y = window.innerHeight
+// Particle class
+class Particle{
+    constructor(){
+        this.x = getRandomInt(0, window.innerWidth / 2);
+        this.y = getRandomInt(0, window.innerHeight);
+        this.vx = Math.random()/2;
+        this.vy = Math.random()/3;
+        this.rad = getRandomInt(3, 10);
+        this.gradSize = getRandomInt(0, this.rad/2);
+    }  
+
+    relocate(){
+        this.x = 0;
+        this.y = getRandomInt(0, window.innerHeight);
+        this.vx = Math.random()/2;
+        this.vy = Math.random()/3;
+    }
+
+    move(){
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x > window.innerWidth || this.y > window.innerHeight){
+            this.relocate();
         }
-        //loop
-        raf = window.requestAnimationFrame(draw);
-
     }
 }
 
-let particle = {
-    x: getRandomInt(window.innerWidth / 2),
-    y: getRandomInt(window.innerHeight),
-    size: getRandomInt(10),
-    blur: 'blur(' + getRandomInt(this.size / 2) + 'px)',
-    draw: function () {
-        ctx.beginPath();
-        ctx.ellipse(this.x, this.y, this.size, this.size, Math.PI / 4, 0, 2 * Math.PI);
-        ctx.closePath();
-        ctx.fillStyle = '#FB7680'
-        ctx.filter = this.blur;
-        ctx.fill()
+function init(){
+    for(i = 0; i < amount; i++){
+        particles.push(new Particle());
     }
 }
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
+var gradient;
+
+function move(){
+    if (canvas.getContext){
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        for(i in particles){
+            p = particles[i]
+            p.move();
+            gradient = ctx.createRadialGradient(p.x, p.y, p.gradSize, p.x, p.y, p.rad);
+            gradient.addColorStop(0, '#FB7680');
+            gradient.addColorStop(1, 'rgba(255,255,255,0.0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(p.x-p.rad, p.y-p.rad, p.rad*2, p.rad*2);
+        }
+        raf = window.requestAnimationFrame(move);
+    }
 }
 
-draw()
+function getRandomInt(min, max) {
+    return Math.floor((Math.random() * (max-min))+min);
+}
+
+init();
+move();
